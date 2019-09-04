@@ -1,0 +1,42 @@
+{
+  "name": "logic-circuit",
+  "version": "0.1.0",
+  "description": "A logical circuit simulator",
+  "scripts": {
+    "start": "webpack-dev-server --env debug",
+    "prebuild:dev": "rimraf dist",
+    "build:dev": "webpack --env debug",
+    "prebuild": "rimraf dist",
+    "build": "webpack --env release",
+    "server": "http-server ./dist -p 8083 -g"
+  },
+  "repository": {
+    "type": "none"
+  },
+  "author": "AFE-GmdG",
+  "license": "MIT",
+  "devDependencies": {
+    "@easm/core": "0.2.5",
+    "@easm/react": "0.2.3",
+    "@easm/ts-plugin-transform": "0.2.5",
+    "@typeless/jss": "5.5.0",
+    "@typeless/jss-preset-default": "0.5.1",
+    "@types/react": "16.9.2",
+    "@types/react-dom": "16.9.0",
+    "@types/uuid": "3.4.5",
+    "copy-webpack-plugin": "5.0.4",
+    "html-webpack-plugin": "3.2.0",
+    "jss": "9.8.7",
+    "jss-plugin-vendor-prefixer": "10.0.0-alpha.7",
+    "jss-preset-default": "4.5.0",
+    "react": "16.9.0",
+    "react-dom": "16.9.0",
+    "rimraf": "3.0.0",
+    "ts-loader": "6.0.4",
+    "typescript": "3.5.3",
+    "uuid": "3.3.3",
+    "webpack": "4.39.2",
+    "webpack-cli": "3.3.7",
+    "webpack-dev-server": "3.8.0"
+  }
+}

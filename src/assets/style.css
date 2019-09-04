@@ -1,0 +1,69 @@
+@font-face {
+	font-family: "Hind";
+	font-style: normal;
+	font-weight: 400;
+	font-display: block;
+	src: url("/assets/hind-regular.ttf");
+}
+
+html {
+	height: 100vh;
+	font-size: 14px;
+	user-select: none;
+	-moz-user-select: none;
+}
+
+body {
+	height: 100vh;
+	margin: 0;
+}
+
+div {
+	margin: 0;
+	padding: 0;
+}
+
+#app {
+	height: 100vh;
+	overflow: hidden;
+}
+
+/* Scrollbar shold be global */
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border: 0px solid #ffffff;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:active {
+  background: #eee;
+}
+
+::-webkit-scrollbar-track {
+  background: #bbb;
+  border: 0px none #ffffff;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-track:hover,
+::-webkit-scrollbar-track:active {
+  background: #bbb;
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

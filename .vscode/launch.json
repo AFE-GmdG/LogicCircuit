@@ -1,0 +1,31 @@
+{
+	"version": "0.2.0",
+	"configurations": [{
+		"type": "chrome",
+		"request": "launch",
+		"name": "Start Webpack-Dev-Server",
+		"url": "http://localhost:8083",
+		"webRoot": "${workspaceFolder}/dist",
+		"preLaunchTask": "npm: start",
+		"runtimeArgs": [
+			"--load-extension=${env:LOCALAPPDATA}\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\4.0.6_0"
+		],
+		"breakOnLoad": false,
+		"breakOnLoadStrategy": "instrument",
+		"sourceMaps": true,
+		"sourceMapPathOverrides": {
+			"webpack:///./*": "${workspaceFolder}/src/*",
+			"webpack:///*": "*"
+		}
+	}, {
+		"type": "chrome",
+		"request": "launch",
+		"name": "Debug Dist",
+		"url": "http://localhost:8083/index.html",
+		"webRoot": "${workspaceFolder}/dist",
+		"preLaunchTask": "npm: server",
+		"breakOnLoad": true,
+		"breakOnLoadStrategy": "instrument",
+		"sourceMaps": false
+	}]
+}
