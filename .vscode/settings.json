@@ -3,6 +3,8 @@
 		".vscode": true,
 		".git": true,
 		"node_modules": true,
+		".gitignore": true,
+		"LogicCircuit.code-workspace": true,
 		"yarn.lock": true,
 		"yarn-error.log": true
 	},
