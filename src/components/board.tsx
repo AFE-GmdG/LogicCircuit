@@ -28,7 +28,7 @@ const themedClasses = (theme: Theme) => ({
 	debugLine: {
 		stroke: "hsla(0, 100%, 50%, 0.5)",
 		strokeWidth: "1px",
-		fill: theme.svg.none
+		fill: "url(#board-background-pattern)"
 	}
 });
 //#endregion
@@ -49,6 +49,10 @@ export const Board: React.FC<BoardProps> = props => {
 		<div className={ classNames(className, classes.board) }>
 			<div className={ classes.scrollContainer }>
 				<svg className={ classes.canvas } viewBox="0 0 4096 4096">
+					<pattern id="board-background-pattern" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+						<rect x="0" y="0" width="1" height="1" fill="hsl(0, 0%, 75%)" />
+					</pattern>
+
 					<rect className={ classes.debugLine }
 						x1={ 0 } y1={ 0 } width={ 4096 } height={ 4096 }
 					/>

@@ -21,6 +21,10 @@
 			fill: hsl(0, 0%, 0%);
 		}
 
+		.mediumFill {
+			fill: hsl(0, 0%, 75%);
+		}
+
 		.lightFill {
 			fill: hsl(0, 0%, 90%);
 		}
@@ -51,4 +55,6 @@
 	<circle class="thinLines blackFill" cx="5" cy="40" r="2" />
 	<circle class="thinLines blackFill" cx="35" cy="30" r="2" />
 	<path class="thinLines whiteFill" d="M 5,16 A 30,27 0 0 1 35,30 A 30,27 0 0 1 5,44 A 30,36 0 0 0 5,16 Z" />
+
+	<rect class="noLine mediumFill" x="1" y="1" width="1" height="1" />
 </svg>
