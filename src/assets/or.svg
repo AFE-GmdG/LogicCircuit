@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+	xmlns:svg="http://www.w3.org/2000/svg"
+	version="1.1"
+	width="40"
+	height="60"
+	viewBox="0 0 40 60">
+
+	<style>
+		.thinLines {
+			stroke: hsl(0, 0%, 0%);
+			strokeWidth: 1px;
+		}
+
+		.mediumLines {
+			stroke: hsl(0, 0%, 0%);
+			strokeWidth: 3px;
+		}
+
+		.blackFill {
+			fill: hsl(0, 0%, 0%);
+		}
+
+		.lightFill {
+			fill: hsl(0, 0%, 90%);
+		}
+
+		.whiteFill {
+			fill: hsl(0, 0%, 100%);
+		}
+
+		.noLine {
+			stroke: none;
+		}
+
+		.noFill {
+			fill: none;
+		}
+
+		.debugLine {
+			stroke: hsla(0, 100%, 50%, .33);
+			stroke-width: 1px;
+		}
+
+		.debugFill {
+			fill: hsl(0, 100%, 50%);
+		}
+	</style>
+
+	<circle class="thinLines blackFill" cx="5" cy="20" r="2" />
+	<circle class="thinLines blackFill" cx="5" cy="40" r="2" />
+	<circle class="thinLines blackFill" cx="35" cy="30" r="2" />
+	<path class="thinLines whiteFill" d="M 5,16 A 30,27 0 0 1 35,30 A 30,27 0 0 1 5,44 A 30,36 0 0 0 5,16 Z" />
+</svg>
