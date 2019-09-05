@@ -19,6 +19,16 @@ const themedClasses = (theme: Theme) => ({
 		borderRadius: "6px",
 		overflow: "scroll",
 		boxShadow: theme.box.thinShadow
+	},
+
+	canvas: {
+		width: "4096px"
+	},
+
+	debugLine: {
+		stroke: "hsla(0, 100%, 50%, 0.5)",
+		strokeWidth: "1px",
+		fill: theme.svg.none
 	}
 });
 //#endregion
@@ -38,6 +48,11 @@ export const Board: React.FC<BoardProps> = props => {
 	return (
 		<div className={ classNames(className, classes.board) }>
 			<div className={ classes.scrollContainer }>
+				<svg className={ classes.canvas } viewBox="0 0 4096 4096">
+					<rect className={ classes.debugLine }
+						x1={ 0 } y1={ 0 } width={ 4096 } height={ 4096 }
+					/>
+				</svg>
 			</div>
 		</div>
 	);
