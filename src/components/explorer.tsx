@@ -8,6 +8,7 @@ import { LogicalCircuit } from "../store/model/logicalCircuit";
 
 import { BasicItem, BasicItemType } from "./basicItem";
 import { Circuit } from "./circuit";
+import { GatterItem } from "./gatterItem";
 
 //#region Konstanten
 const themedClasses = (theme: Theme) => ({
@@ -245,7 +246,7 @@ const ExplorerItem: React.FC<ExplorerItemProps> = props => {
 	const classes = useTheme(themedClasses);
 
 	const editor = "gatterType" in props
-		? <div></div>
+		? <GatterItem gatterType={ props.gatterType } isTemplateItem />
 		: "type" in props
 			? <BasicItem type={ props.type } isTemplateItem />
 			: <Circuit mode={ props.circuit.showVisualElements ? "Preview" : "Chip" } circuit={ props.circuit } />

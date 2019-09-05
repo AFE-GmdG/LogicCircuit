@@ -41,6 +41,7 @@ export const defaultTheme = {
 		strokeWidthThin: "1px",
 		strokeWidthMedium: "3px",
 
+		fillBlack: "hsl(0, 0%, 0%)",
 		fillLight: "hsl(0, 0%, 90%)",
 		fillWhite: "hsl(0, 0%, 100%)",
 		none: "none"
