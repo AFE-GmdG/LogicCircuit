@@ -88,6 +88,7 @@ module.exports = (env) => [{
 			logLevel: "error"
 		}),
 		new HtmlWebpackPlugin({
+			baseUrl: env === "docs" ? "https://a-friedel.github.io/LogicCircuit/" : "/",
 			filename: "index.html",
 			template: "index.html",
 			inject: "body",
