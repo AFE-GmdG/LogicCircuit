@@ -31,7 +31,7 @@ module.exports = (env) => [{
 		]
 	},
 
-	devtool: env === "release" ? false : "source-map",
+	devtool: env === "release" || env === "public" ? false : "source-map",
 
 	resolve: {
 		extensions: [".ts", ".tsx", ".js"],
@@ -42,7 +42,7 @@ module.exports = (env) => [{
 
 	output: {
 		filename: "[name].js",
-		path: path.resolve(cwd, "dist"),
+		path: path.resolve(cwd, env === "public" ? "public" : "dist"),
 		publicPath: "",
 		globalObject: "self"
 	},
@@ -66,8 +66,8 @@ module.exports = (env) => [{
 
 	optimization: {
 		noEmitOnErrors: true,
-		namedModules: /*env !== "release"*/ true,
-		namedChunks: /*env !== "release"*/ true,
+		namedModules: env !== "public",
+		namedChunks: env !== "public",
 		minimize: false
 	},
 
@@ -76,8 +76,14 @@ module.exports = (env) => [{
 			/^@microsoft(\/|\\)typescript-etw$/
 		),
 		new CopyWebpackPlugin([{
-			from: path.resolve(cwd, "src/assets/*.*"),
-			to: path.resolve(cwd, "dist")
+			from: path.resolve(cwd, "src/assets/*.css"),
+			to: path.resolve(cwd, env === "public" ? "public" : "dist")
+		}, {
+			from: path.resolve(cwd, "src/assets/*.woff2"),
+			to: path.resolve(cwd, env === "public" ? "public" : "dist")
+		}, {
+			from: path.resolve(cwd, "src/assets/*.ttf"),
+			to: path.resolve(cwd, env === "public" ? "public" : "dist")
 		}], {
 			logLevel: "error"
 		}),
@@ -90,7 +96,7 @@ module.exports = (env) => [{
 				collapseWhitespace: true
 			}
 		}),
-		...(env === "release") ? [
+		...(env === "release" || env === "public") ? [
 			new webpack.DefinePlugin({
 				"process.env": {
 					NODE_ENV: "'production'",
@@ -98,13 +104,13 @@ module.exports = (env) => [{
 				}
 			})
 		] : [
-				new webpack.DefinePlugin({
-					"process.env": {
-						NODE_ENV: "'development'",
-						VERSION: JSON.stringify(require("./package.json").version)
-					}
-				})
-			]
+			new webpack.DefinePlugin({
+				"process.env": {
+					NODE_ENV: "'development'",
+					VERSION: JSON.stringify(require("./package.json").version)
+				}
+			})
+		]
 	],
 
 	devServer: {

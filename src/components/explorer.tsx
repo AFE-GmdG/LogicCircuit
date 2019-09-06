@@ -150,7 +150,7 @@ export const Explorer: React.FC<ExplorerProps> = props => {
 	const [defaultSectionsExpandedState, setDefaultSectionsExpandedState] = React.useState({
 		textNoteSection: false,
 		inputOutputSection: false,
-		primitivesSection: false
+		primitivesSection: true
 	});
 
 	return (

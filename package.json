@@ -8,7 +8,10 @@
     "build:dev": "webpack --env debug",
     "prebuild": "rimraf dist",
     "build": "webpack --env release",
-    "server": "http-server ./dist -p 8083 -g"
+    "prepublic": "rimraf public/*",
+    "public": "webpack --env public",
+    "server": "http-server ./dist -p 8083 -g",
+    "serve:public": "http-server ./public -p 8083 -g"
   },
   "repository": {
     "type": "none"
