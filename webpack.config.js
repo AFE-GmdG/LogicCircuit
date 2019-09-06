@@ -31,7 +31,7 @@ module.exports = (env) => [{
 		]
 	},
 
-	devtool: env === "release" || env === "public" ? false : "source-map",
+	devtool: env === "release" || env === "docs" ? false : "source-map",
 
 	resolve: {
 		extensions: [".ts", ".tsx", ".js"],
@@ -42,7 +42,7 @@ module.exports = (env) => [{
 
 	output: {
 		filename: "[name].js",
-		path: path.resolve(cwd, env === "public" ? "public" : "dist"),
+		path: path.resolve(cwd, env === "docs" ? "docs" : "dist"),
 		publicPath: "",
 		globalObject: "self"
 	},
@@ -66,8 +66,8 @@ module.exports = (env) => [{
 
 	optimization: {
 		noEmitOnErrors: true,
-		namedModules: env !== "public",
-		namedChunks: env !== "public",
+		namedModules: env !== "docs",
+		namedChunks: env !== "docs",
 		minimize: false
 	},
 
@@ -77,13 +77,13 @@ module.exports = (env) => [{
 		),
 		new CopyWebpackPlugin([{
 			from: path.resolve(cwd, "src/assets/*.css"),
-			to: path.resolve(cwd, env === "public" ? "public" : "dist")
+			to: path.resolve(cwd, env === "docs" ? "docs" : "dist")
 		}, {
 			from: path.resolve(cwd, "src/assets/*.woff2"),
-			to: path.resolve(cwd, env === "public" ? "public" : "dist")
+			to: path.resolve(cwd, env === "docs" ? "docs" : "dist")
 		}, {
 			from: path.resolve(cwd, "src/assets/*.ttf"),
-			to: path.resolve(cwd, env === "public" ? "public" : "dist")
+			to: path.resolve(cwd, env === "docs" ? "docs" : "dist")
 		}], {
 			logLevel: "error"
 		}),
@@ -96,7 +96,7 @@ module.exports = (env) => [{
 				collapseWhitespace: true
 			}
 		}),
-		...(env === "release" || env === "public") ? [
+		...(env === "release" || env === "docs") ? [
 			new webpack.DefinePlugin({
 				"process.env": {
 					NODE_ENV: "'production'",

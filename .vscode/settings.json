@@ -3,7 +3,7 @@
 		".vscode": true,
 		".git": true,
 		"node_modules": true,
-		"public": true,
+		"docs": true,
 		".gitignore": true,
 		"LogicCircuit.code-workspace": true,
 		"yarn.lock": true,
