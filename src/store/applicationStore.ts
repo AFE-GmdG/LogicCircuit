@@ -1,42 +1,43 @@
 import * as uuid from "uuid";
-
 import { Store } from "@easm/core";
 import { createHook } from "@easm/react";
 
-import { LogicalCircuit, createEmptyLogicalCircuit } from "./model/logicalCircuit";
+import { LogicalProject, DefaultCategoy, LogicalCircuit } from "./model/logicalProject";
 
 type ApplicationStoreState = {
 	ui: {
 		selectedCircuitId: string;
 	},
 	data: {
-		circuits: LogicalCircuit[],
-		currentProjectId: string
+		project: LogicalProject
 	}
 };
 
-const mainCircuit = createEmptyLogicalCircuit();
-const c1 = createEmptyLogicalCircuit();
-c1.category = "LEDs";
-c1.name = "LED-Leiste";
-c1.showVisualElements = true;
-const c2 = createEmptyLogicalCircuit();
-c2.category = "Tests";
-c2.name = "Test: LED-Leiste";
-const c3 = createEmptyLogicalCircuit();
-c3.category = "Tests";
-c3.name = "Test: SR-Latch";
-const c4 = createEmptyLogicalCircuit();
-c4.name = "SR-Latch";
+const mainCircuit: LogicalCircuit = {
+	id: uuid(),
+	name: "New Circuit",
+	category: null,
+	showVisualElements: false
+};
+
+const defaultCategoy: DefaultCategoy = {
+	name: null,
+	circuits: [mainCircuit],
+	isCollapsed: false
+};
+
+const project: LogicalProject = {
+	id: uuid(),
+	startCircuitId: mainCircuit.id,
+	categories: [defaultCategoy],
+	textNoteCategory: true,
+	inputOutputCategory: true,
+	primitivesCategory: true
+};
 
 const applicationStore = new Store<ApplicationStoreState>({
-	ui: {
-		selectedCircuitId: mainCircuit.id
-	},
-	data: {
-		circuits: [mainCircuit, c1, c2, c3, c4],
-		currentProjectId: uuid()
-	}
+	ui: { selectedCircuitId: project.startCircuitId },
+	data: { project }
 });
 
 export const useUIStore = createHook(applicationStore.state.ui);

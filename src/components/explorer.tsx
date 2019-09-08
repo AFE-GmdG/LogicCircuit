@@ -1,16 +1,23 @@
 import * as React from "react";
 import { get } from "@easm/core";
 
+import { LocalizedStrings } from "../common";
 import { Theme, useTheme, classNames, conditionalClassName } from "../themes";
 import { useDataStore } from "../store";
 import { GatterType } from "../store/model/gatter";
-import { LogicalCircuit } from "../store/model/logicalCircuit";
+import {
+	LogicalProject,
+	Category,
+	LogicalCircuit,
+	expandOrCollapseCategoryAction,
+	expandOrCollapseSpecialCategoryAction
+} from "../store/model/logicalProject";
 
 import { BasicItem, BasicItemType } from "./basicItem";
 import { Circuit } from "./circuit";
 import { GatterItem } from "./gatterItem";
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme: Theme) => ({
 	expanded: {},
 
@@ -28,7 +35,7 @@ const themedClasses = (theme: Theme) => ({
 		overflow: "auto"
 	},
 
-	section: {
+	category: {
 		flex: "0 0 auto",
 		margin: 0,
 		padding: 0,
@@ -96,6 +103,21 @@ const themedClasses = (theme: Theme) => ({
 	}
 });
 
+const strings = new LocalizedStrings({
+	en: {
+		defaultCategoryName: "Circuit Project",
+		textNoteCategoryName: "Text Note",
+		inputOutputCategoryName: "Input / Output",
+		primitivesCategoryName: "Primitives"
+	},
+	de: {
+		defaultCategoryName: "Schaltungs-Projekt",
+		textNoteCategoryName: "Beschriftung",
+		inputOutputCategoryName: "Eingang / Ausgang",
+		primitivesCategoryName: "Grundformen"
+	}
+}, "en");
+
 const gatterItems: GatterExplorerItemProps[] = [
 	{ name: "Not", gatterType: "Not" },
 	{ name: "And", gatterType: "And" },
@@ -112,88 +134,67 @@ type ExplorerProps = {
 	className?: string;
 };
 
-type Section = {
-	category: string | null;
-	label: string;
-	isExpanded: boolean;
-};
-
 export const Explorer: React.FC<ExplorerProps> = props => {
-	function expandOrCollapseSection(event: React.MouseEvent<HTMLDivElement, MouseEvent>, section: Section) {
-		const index = sections.indexOf(section);
-		setSections(sections.slice(0, index).concat(
-			[{ ...section, isExpanded: !section.isExpanded }],
-			sections.slice(index + 1)
-		));
+	function expandOrCollapseCategory(event: React.MouseEvent<HTMLDivElement, MouseEvent>, category: Category) {
+		expandOrCollapseCategoryAction(category);
 		event.stopPropagation();
 	}
 
-	function expandOrCollapseDefaultSectionSection(event: React.MouseEvent<HTMLDivElement, MouseEvent>, defaultSection: keyof typeof defaultSectionsExpandedState) {
-		setDefaultSectionsExpandedState({ ...defaultSectionsExpandedState, [defaultSection]: !defaultSectionsExpandedState[defaultSection] });
+	function expandOrCollapseDefaultSectionSection(event: React.MouseEvent<HTMLDivElement, MouseEvent>, specialCategory: keyof Pick<LogicalProject, "textNoteCategory" | "inputOutputCategory" | "primitivesCategory">) {
+		expandOrCollapseSpecialCategoryAction(specialCategory);
 		event.stopPropagation();
 	}
 
 	const { className } = props;
 	const classes = useTheme(themedClasses);
-	const { circuits } = useDataStore(store => ({
-		circuits: get(store.state.circuits)
+	const { project } = useDataStore(store => ({
+		project: get(store.state.project)
 	}));
 
-	const [sections, setSections] = React.useState<Section[]>(Array.from(
-		circuits.reduce((acc, circuit) => acc.add(circuit.category), new Set<string | null>([null])),
-		(item, index) => ({
-			category: item,
-			label: item || "Circuit Project",
-			isExpanded: index === 0
-		})
-	));
-	const [defaultSectionsExpandedState, setDefaultSectionsExpandedState] = React.useState({
-		textNoteSection: false,
-		inputOutputSection: false,
-		primitivesSection: true
-	});
+	const categories = project.categories;
 
 	return (
 		<ul className={ classNames(className, classes.explorer) }>
-			{ sections.map(section => (
-				<li key={ section.category || 0 } className={ classes.section }>
-					<div className={ classNames(classes.header, conditionalClassName(classes.expanded, section.isExpanded)) }
-						onClick={ event => expandOrCollapseSection(event, section) }>
-						{ section.label }
-					</div>
-					{
-						section.isExpanded && (
-							<ul className={ classes.content }>
-								{
-									circuits
-										.filter(circuit => circuit.category === section.category)
-										.map(circuit => (
+			{
+				categories.map(category => (
+					<li key={ category.name || 0 } className={ classes.category }>
+						<div className={ classNames(classes.header, conditionalClassName(classes.expanded, !category.isCollapsed)) }
+							onClick={ event => expandOrCollapseCategory(event, category) }>
+							{ category.name || strings.getString("defaultCategoryName", "Circuit Project") }
+						</div>
+						{
+							!category.isCollapsed && (
+								<ul className={ classes.content }>
+									{
+										category.circuits.map(circuit => (
 											<ExplorerItem key={ circuit.id } circuit={ circuit } />
 										))
-								}
-							</ul>) || null
-					}
-				</li>
-			)) }
-			<li className={ classes.section }>
-				<div className={ classNames(classes.header, conditionalClassName(classes.expanded, defaultSectionsExpandedState.textNoteSection)) }
-					onClick={ event => expandOrCollapseDefaultSectionSection(event, "textNoteSection") }>
-					Text Note
+									}
+								</ul>
+							) || null
+						}
+					</li>
+				))
+			}
+			<li className={ classes.category }>
+				<div className={ classNames(classes.header, conditionalClassName(classes.expanded, !project.textNoteCategory)) }
+					onClick={ event => expandOrCollapseDefaultSectionSection(event, "textNoteCategory") }>
+					{ strings.getString("textNoteCategoryName", "Text Node") }
 				</div>
 				{
-					defaultSectionsExpandedState.textNoteSection && (
+					!project.textNoteCategory && (
 						<ul className={ classes.content }>
 							<ExplorerItem type="Text Note" />
 						</ul>) || null
 				}
 			</li>
-			<li className={ classes.section }>
-				<div className={ classNames(classes.header, conditionalClassName(classes.expanded, defaultSectionsExpandedState.inputOutputSection)) }
-					onClick={ event => expandOrCollapseDefaultSectionSection(event, "inputOutputSection") }>
-					Input / Output
+			<li className={ classes.category }>
+				<div className={ classNames(classes.header, conditionalClassName(classes.expanded, !project.inputOutputCategory)) }
+					onClick={ event => expandOrCollapseDefaultSectionSection(event, "inputOutputCategory") }>
+					{ strings.getString("inputOutputCategoryName", "Input / Output") }
 				</div>
 				{
-					defaultSectionsExpandedState.inputOutputSection && (
+					!project.inputOutputCategory && (
 						<ul className={ classes.content }>
 							<ExplorerItem type="Pin" />
 							<ExplorerItem type="Button" />
@@ -206,13 +207,13 @@ export const Explorer: React.FC<ExplorerProps> = props => {
 						</ul>) || null
 				}
 			</li>
-			<li className={ classes.section }>
-				<div className={ classNames(classes.header, conditionalClassName(classes.expanded, defaultSectionsExpandedState.primitivesSection)) }
-					onClick={ event => expandOrCollapseDefaultSectionSection(event, "primitivesSection") }>
-					Primitives
+			<li className={ classes.category }>
+				<div className={ classNames(classes.header, conditionalClassName(classes.expanded, !project.primitivesCategory)) }
+					onClick={ event => expandOrCollapseDefaultSectionSection(event, "primitivesCategory") }>
+					{ strings.getString("primitivesCategoryName", "Primitives") }
 				</div>
 				{
-					defaultSectionsExpandedState.primitivesSection && (
+					!project.primitivesCategory && (
 						<ul className={ classes.content }>
 							{ gatterItems.map(gatterItem => <ExplorerItem key={ gatterItem.gatterType } { ...gatterItem } />) }
 						</ul>) || null

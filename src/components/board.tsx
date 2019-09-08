@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Theme, useTheme, classNames } from "../themes";
 
-import { LogicalCircuit } from "../store/model/logicalCircuit";
+import { LogicalCircuit } from "../store/model/logicalProject";
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme: Theme) => ({
 	zoom25: {},
 	zoom50: {},
@@ -66,7 +66,7 @@ const themedClasses = (theme: Theme) => ({
 });
 //#endregion
 
-//#region Typen
+//#region Types
 type BoardProps = {
 	className?: string;
 	circuit: LogicalCircuit;

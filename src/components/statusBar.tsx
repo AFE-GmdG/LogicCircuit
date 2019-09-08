@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Theme, useTheme, classNames } from "../themes";
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme: Theme) => ({
 	statusBar: {
 		position: "relative",
@@ -13,7 +13,7 @@ const themedClasses = (theme: Theme) => ({
 });
 //#endregion
 
-//#region Typen
+//#region Types
 type StatusBarProps = {
 	className?: string;
 }

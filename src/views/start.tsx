@@ -5,14 +5,14 @@ import { orThrow } from "../common";
 import { Theme, useTheme } from "../themes";
 import { useUIStore, useDataStore } from "../store";
 
-import { LogicalCircuit } from "../store/model/logicalCircuit";
+import { LogicalCircuit } from "../store/model/logicalProject";
 
 import { MenuBar } from "../components/menuBar";
 import { StatusBar } from "../components/statusBar";
 import { Explorer } from "../components/explorer";
 import { Board } from "../components/board";
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme: Theme) => ({
 	start: {
 		backgroundColor: theme.colors.backgroundColor,
@@ -50,12 +50,13 @@ export const Start: React.FC = props => {
 	const classes = useTheme(themedClasses);
 	const { selectedCircuitId } = useUIStore(store => ({
 		selectedCircuitId: get(store.state.selectedCircuitId)
-	}))
-	const { circuits } = useDataStore(store => ({
-		circuits: get(store.state.circuits)
 	}));
-
-	const currentBoard: LogicalCircuit = circuits.find(circuit => circuit.id === selectedCircuitId) || orThrow("Circuit not found: " + selectedCircuitId);
+	const { project } = useDataStore(store => ({
+		project: get(store.state.project)
+	}));
+	const currentBoard: LogicalCircuit = project.categories.reduce<LogicalCircuit | undefined>((acc, cur) =>
+		acc || cur.circuits.find(circuit => circuit.id === selectedCircuitId),
+		undefined) || orThrow("Circuit not found: " + selectedCircuitId);
 
 	return (
 		<div className={ classes.start }>

@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Theme, useTheme, classNames } from "../themes";
 
-import { LogicalCircuit } from "../store/model/logicalCircuit";
+import { LogicalCircuit } from "../store/model/logicalProject";
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme: Theme) => ({
 	circuit: {
 		display: "block",

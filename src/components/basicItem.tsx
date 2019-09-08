@@ -3,7 +3,7 @@ import { Theme, useTheme, classNames } from "../themes";
 
 import { BitWidth, BitWidthEditor, PinSide, PinSideEditor } from "./editors";
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme: Theme) => ({
 	icon: {
 		flex: "0 0 4rem"

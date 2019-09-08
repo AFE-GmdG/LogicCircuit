@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Theme, useTheme, classNames } from "../themes";
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme: Theme) => ({
 	itemEditor: {
 		height: theme.fonts.lineHeightMedium,

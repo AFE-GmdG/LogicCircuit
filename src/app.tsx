@@ -4,7 +4,7 @@ import { render } from "react-dom";
 import { Theme, ThemeProvider, useTheme } from "./themes"
 import { Start } from "./views";
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme: Theme) => ({
 	"@global": {
 		html: {
@@ -62,7 +62,7 @@ const themedClasses = (theme: Theme) => ({
 });
 //#endregion
 
-
+//#region App
 const App: React.FC = props => {
 	// Apply the global css styles.
 	useTheme(themedClasses);
@@ -76,3 +76,4 @@ render(
 	</ThemeProvider>,
 	document.getElementById("app")
 );
+//#endregion

@@ -5,7 +5,7 @@ import { GatterType } from "../store/model/gatter";
 
 import { InputPinCount, InputPinCountEditor } from "./editors";
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme: Theme) => ({
 	icon: {
 		flex: "0 0 4rem"
