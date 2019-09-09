@@ -107,7 +107,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme) => ({
     "@global": {
         html: {
@@ -155,6 +155,7 @@ const themedClasses = (theme) => ({
     }
 });
 //#endregion
+//#region App
 const App = props => {
     // Apply the global css styles.
     Object(_themes__WEBPACK_IMPORTED_MODULE_2__["useTheme"])(themedClasses);
@@ -162,6 +163,7 @@ const App = props => {
 };
 Object(react_dom__WEBPACK_IMPORTED_MODULE_1__["render"])(react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_themes__WEBPACK_IMPORTED_MODULE_2__["ThemeProvider"], null,
     react__WEBPACK_IMPORTED_MODULE_0__["createElement"](App, null)), document.getElementById("app"));
+//#endregion
 
 
 /***/ }),
@@ -6342,9 +6344,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(80);
 /* harmony import */ var _themes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9);
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(81);
-/* harmony import */ var _components_menuBar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(91);
-/* harmony import */ var _components_statusBar__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(92);
-/* harmony import */ var _components_explorer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(93);
+/* harmony import */ var _components_menuBar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(90);
+/* harmony import */ var _components_statusBar__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(91);
+/* harmony import */ var _components_explorer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(92);
 /* harmony import */ var _components_board__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(98);
 
 
@@ -6355,7 +6357,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme) => ({
     start: {
         backgroundColor: theme.colors.backgroundColor,
@@ -6389,10 +6391,10 @@ const Start = props => {
     const { selectedCircuitId } = Object(_store__WEBPACK_IMPORTED_MODULE_4__["useUIStore"])(store => ({
         selectedCircuitId: store.get(["state", "selectedCircuitId"])
     }));
-    const { circuits } = Object(_store__WEBPACK_IMPORTED_MODULE_4__["useDataStore"])(store => ({
-        circuits: store.get(["state", "circuits"])
+    const { project } = Object(_store__WEBPACK_IMPORTED_MODULE_4__["useDataStore"])(store => ({
+        project: store.get(["state", "project"])
     }));
-    const currentBoard = circuits.find(circuit => circuit.id === selectedCircuitId) || Object(_common__WEBPACK_IMPORTED_MODULE_2__["orThrow"])("Circuit not found: " + selectedCircuitId);
+    const currentBoard = project.categories.reduce((acc, cur) => acc || cur.circuits.find(circuit => circuit.id === selectedCircuitId), undefined) || Object(_common__WEBPACK_IMPORTED_MODULE_2__["orThrow"])("Circuit not found: " + selectedCircuitId);
     return (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: classes.start },
         react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_components_explorer__WEBPACK_IMPORTED_MODULE_7__["Explorer"], null),
         react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_components_board__WEBPACK_IMPORTED_MODULE_8__["Board"], { className: classes.content, circuit: currentBoard }),
@@ -7348,8 +7350,63 @@ var merge = function (vpath, value) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "orThrow", function() { return orThrow; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LocalizedStrings", function() { return LocalizedStrings; });
 function orThrow(message = "Unexpected falsy") {
     throw new Error(message);
+}
+class LocalizedStrings {
+    /**
+     * The currently used language.
+     */
+    get language() {
+        return this.currentLanguage;
+    }
+    /**
+     * Can be used from ouside the class to set a particular language.
+     */
+    set language(language) {
+        this.currentLanguage = this.getBestMatchingLanguage(language);
+    }
+    constructor(props, defaultLanguage = "en") {
+        this.props = props;
+        this.defaultLanguage = defaultLanguage;
+        this.language = this.getBestMatchingLanguage((navigator.language && typeof navigator.language !== "undefined")
+            ? navigator.language
+            : (navigator.userLanguage && typeof navigator.userLanguage !== "undefined")
+                ? navigator.userLanguage
+                : defaultLanguage);
+    }
+    getBestMatchingLanguage(language) {
+        // If an object with the passed language key exists return it
+        if (this.props[language]) {
+            return language;
+        }
+        // if the string is composed try to find a match with only the first language identifiers (en-US --> en)
+        const index = language.indexOf("-");
+        if (index >= 0) {
+            language = language.substring(0, index);
+            if (this.props[language]) {
+                return language;
+            }
+        }
+        // Return the default language
+        return this.defaultLanguage;
+    }
+    /**
+     * Gets the translated string for specified key. Returns undefined if the key isn't present.
+     * @param key The key to get the translation.
+     */
+    get(key) {
+        return this.props[this.currentLanguage][key] || this.props[this.defaultLanguage][key];
+    }
+    /**
+     * Gets the translated string for specified key. Returns the default value if the key isn't present.
+     * @param key The key to get the translation.
+     * @param defaultValue The default value if the key isn't present.
+     */
+    getString(key, defaultValue) {
+        return this.get(key) || defaultValue;
+    }
 }
 
 
@@ -7379,32 +7436,31 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(uuid__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _easm_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(75);
 /* harmony import */ var _easm_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(88);
-/* harmony import */ var _model_logicalCircuit__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(90);
 
 
 
-
-const mainCircuit = Object(_model_logicalCircuit__WEBPACK_IMPORTED_MODULE_3__["createEmptyLogicalCircuit"])();
-const c1 = Object(_model_logicalCircuit__WEBPACK_IMPORTED_MODULE_3__["createEmptyLogicalCircuit"])();
-c1.category = "LEDs";
-c1.name = "LED-Leiste";
-c1.showVisualElements = true;
-const c2 = Object(_model_logicalCircuit__WEBPACK_IMPORTED_MODULE_3__["createEmptyLogicalCircuit"])();
-c2.category = "Tests";
-c2.name = "Test: LED-Leiste";
-const c3 = Object(_model_logicalCircuit__WEBPACK_IMPORTED_MODULE_3__["createEmptyLogicalCircuit"])();
-c3.category = "Tests";
-c3.name = "Test: SR-Latch";
-const c4 = Object(_model_logicalCircuit__WEBPACK_IMPORTED_MODULE_3__["createEmptyLogicalCircuit"])();
-c4.name = "SR-Latch";
+const mainCircuit = {
+    id: uuid__WEBPACK_IMPORTED_MODULE_0__(),
+    name: "New Circuit",
+    category: null,
+    showVisualElements: false
+};
+const defaultCategoy = {
+    name: null,
+    circuits: [mainCircuit],
+    isCollapsed: false
+};
+const project = {
+    id: uuid__WEBPACK_IMPORTED_MODULE_0__(),
+    startCircuitId: mainCircuit.id,
+    categories: [defaultCategoy],
+    textNoteCategory: true,
+    inputOutputCategory: true,
+    primitivesCategory: true
+};
 const applicationStore = new _easm_core__WEBPACK_IMPORTED_MODULE_1__["Store"]({
-    ui: {
-        selectedCircuitId: mainCircuit.id
-    },
-    data: {
-        circuits: [mainCircuit, c1, c2, c3, c4],
-        currentProjectId: uuid__WEBPACK_IMPORTED_MODULE_0__()
-    }
+    ui: { selectedCircuitId: project.startCircuitId },
+    data: { project }
 });
 const useUIStore = Object(_easm_react__WEBPACK_IMPORTED_MODULE_2__["createHook"])(applicationStore.getSubStore(["state", "ui"]));
 const useDataStore = Object(_easm_react__WEBPACK_IMPORTED_MODULE_2__["createHook"])(applicationStore.getSubStore(["state", "data"]));
@@ -7744,31 +7800,13 @@ function createHook(store) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createEmptyLogicalCircuit", function() { return createEmptyLogicalCircuit; });
-/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(83);
-/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(uuid__WEBPACK_IMPORTED_MODULE_0__);
-
-const createEmptyLogicalCircuit = () => ({
-    id: uuid__WEBPACK_IMPORTED_MODULE_0__(),
-    name: "New Circuit",
-    category: null,
-    showVisualElements: false
-});
-
-
-/***/ }),
-/* 91 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MenuBar", function() { return MenuBar; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _themes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
 
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme) => ({
     menuBar: {
         position: "relative",
@@ -7790,7 +7828,7 @@ const MenuBar = props => {
 
 
 /***/ }),
-/* 92 */
+/* 91 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7801,7 +7839,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _themes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
 
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme) => ({
     statusBar: {
         position: "relative",
@@ -7822,7 +7860,7 @@ const StatusBar = props => {
 
 
 /***/ }),
-/* 93 */
+/* 92 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7831,11 +7869,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _easm_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(75);
-/* harmony import */ var _themes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9);
-/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(81);
-/* harmony import */ var _basicItem__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(94);
-/* harmony import */ var _circuit__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(96);
-/* harmony import */ var _gatterItem__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(97);
+/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(80);
+/* harmony import */ var _themes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9);
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(81);
+/* harmony import */ var _store_model_logicalProject__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(93);
+/* harmony import */ var _basicItem__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(94);
+/* harmony import */ var _circuit__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(96);
+/* harmony import */ var _gatterItem__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(97);
 
 
 
@@ -7843,7 +7883,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-//#region Konstanten
+
+
+//#region Constants
 const themedClasses = (theme) => ({
     expanded: {},
     explorer: {
@@ -7859,7 +7901,7 @@ const themedClasses = (theme) => ({
         listStyle: "none",
         overflow: "auto"
     },
-    section: {
+    category: {
         flex: "0 0 auto",
         margin: 0,
         padding: 0,
@@ -7916,8 +7958,25 @@ const themedClasses = (theme) => ({
         "&:hover": {
             backgroundColor: theme.colors.hoverBackgroundColor
         }
+    },
+    pointer: {
+        cursor: "pointer"
     }
 });
+const strings = new _common__WEBPACK_IMPORTED_MODULE_2__["LocalizedStrings"]({
+    en: {
+        defaultCategoryName: "Circuit Project",
+        textNoteCategoryName: "Text Note",
+        inputOutputCategoryName: "Input / Output",
+        primitivesCategoryName: "Primitives"
+    },
+    de: {
+        defaultCategoryName: "Schaltungs-Projekt",
+        textNoteCategoryName: "Beschriftung",
+        inputOutputCategoryName: "Eingang / Ausgang",
+        primitivesCategoryName: "Grundformen"
+    }
+}, "en");
 const gatterItems = [
     { name: "Not", gatterType: "Not" },
     { name: "And", gatterType: "And" },
@@ -7928,43 +7987,34 @@ const gatterItems = [
     { name: "XNor", gatterType: "Xnor" }
 ];
 const Explorer = props => {
-    function expandOrCollapseSection(event, section) {
-        const index = sections.indexOf(section);
-        setSections(sections.slice(0, index).concat([{ ...section, isExpanded: !section.isExpanded }], sections.slice(index + 1)));
+    function expandOrCollapseCategory(event, category) {
+        Object(_store_model_logicalProject__WEBPACK_IMPORTED_MODULE_5__["expandOrCollapseCategoryAction"])(category);
         event.stopPropagation();
     }
-    function expandOrCollapseDefaultSectionSection(event, defaultSection) {
-        setDefaultSectionsExpandedState({ ...defaultSectionsExpandedState, [defaultSection]: !defaultSectionsExpandedState[defaultSection] });
+    function expandOrCollapseDefaultSectionSection(event, specialCategory) {
+        Object(_store_model_logicalProject__WEBPACK_IMPORTED_MODULE_5__["expandOrCollapseSpecialCategoryAction"])(specialCategory);
         event.stopPropagation();
     }
     const { className } = props;
-    const classes = Object(_themes__WEBPACK_IMPORTED_MODULE_2__["useTheme"])(themedClasses);
-    const { circuits } = Object(_store__WEBPACK_IMPORTED_MODULE_3__["useDataStore"])(store => ({
-        circuits: store.get(["state", "circuits"])
+    const classes = Object(_themes__WEBPACK_IMPORTED_MODULE_3__["useTheme"])(themedClasses);
+    const { project } = Object(_store__WEBPACK_IMPORTED_MODULE_4__["useDataStore"])(store => ({
+        project: store.get(["state", "project"])
     }));
-    const [sections, setSections] = react__WEBPACK_IMPORTED_MODULE_0__["useState"](Array.from(circuits.reduce((acc, circuit) => acc.add(circuit.category), new Set([null])), (item, index) => ({
-        category: item,
-        label: item || "Circuit Project",
-        isExpanded: index === 0
-    })));
-    const [defaultSectionsExpandedState, setDefaultSectionsExpandedState] = react__WEBPACK_IMPORTED_MODULE_0__["useState"]({
-        textNoteSection: false,
-        inputOutputSection: false,
-        primitivesSection: true
-    });
-    return (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("ul", { className: Object(_themes__WEBPACK_IMPORTED_MODULE_2__["classNames"])(className, classes.explorer) },
-        sections.map(section => (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("li", { key: section.category || 0, className: classes.section },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: Object(_themes__WEBPACK_IMPORTED_MODULE_2__["classNames"])(classes.header, Object(_themes__WEBPACK_IMPORTED_MODULE_2__["conditionalClassName"])(classes.expanded, section.isExpanded)), onClick: event => expandOrCollapseSection(event, section) }, section.label),
-            section.isExpanded && (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("ul", { className: classes.content }, circuits
-                .filter(circuit => circuit.category === section.category)
-                .map(circuit => (react__WEBPACK_IMPORTED_MODULE_0__["createElement"](ExplorerItem, { key: circuit.id, circuit: circuit }))))) || null))),
-        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("li", { className: classes.section },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: Object(_themes__WEBPACK_IMPORTED_MODULE_2__["classNames"])(classes.header, Object(_themes__WEBPACK_IMPORTED_MODULE_2__["conditionalClassName"])(classes.expanded, defaultSectionsExpandedState.textNoteSection)), onClick: event => expandOrCollapseDefaultSectionSection(event, "textNoteSection") }, "Text Note"),
-            defaultSectionsExpandedState.textNoteSection && (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("ul", { className: classes.content },
+    const { selectedCircuitId } = Object(_store__WEBPACK_IMPORTED_MODULE_4__["useUIStore"])(store => ({
+        selectedCircuitId: store.get(["state", "selectedCircuitId"])
+    }));
+    const categories = project.categories;
+    return (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("ul", { className: Object(_themes__WEBPACK_IMPORTED_MODULE_3__["classNames"])(className, classes.explorer) },
+        categories.map(category => (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("li", { key: category.name || 0, className: classes.category },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: Object(_themes__WEBPACK_IMPORTED_MODULE_3__["classNames"])(classes.header, Object(_themes__WEBPACK_IMPORTED_MODULE_3__["conditionalClassName"])(classes.expanded, !category.isCollapsed)), onClick: event => expandOrCollapseCategory(event, category) }, category.name || strings.getString("defaultCategoryName", "Circuit Project")),
+            !category.isCollapsed && (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("ul", { className: classes.content }, category.circuits.map(circuit => (react__WEBPACK_IMPORTED_MODULE_0__["createElement"](ExplorerItem, { key: circuit.id, circuit: circuit, selectedCircuitId: selectedCircuitId }))))) || null))),
+        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("li", { className: classes.category },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: Object(_themes__WEBPACK_IMPORTED_MODULE_3__["classNames"])(classes.header, Object(_themes__WEBPACK_IMPORTED_MODULE_3__["conditionalClassName"])(classes.expanded, !project.textNoteCategory)), onClick: event => expandOrCollapseDefaultSectionSection(event, "textNoteCategory") }, strings.getString("textNoteCategoryName", "Text Node")),
+            !project.textNoteCategory && (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("ul", { className: classes.content },
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"](ExplorerItem, { type: "Text Note" }))) || null),
-        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("li", { className: classes.section },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: Object(_themes__WEBPACK_IMPORTED_MODULE_2__["classNames"])(classes.header, Object(_themes__WEBPACK_IMPORTED_MODULE_2__["conditionalClassName"])(classes.expanded, defaultSectionsExpandedState.inputOutputSection)), onClick: event => expandOrCollapseDefaultSectionSection(event, "inputOutputSection") }, "Input / Output"),
-            defaultSectionsExpandedState.inputOutputSection && (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("ul", { className: classes.content },
+        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("li", { className: classes.category },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: Object(_themes__WEBPACK_IMPORTED_MODULE_3__["classNames"])(classes.header, Object(_themes__WEBPACK_IMPORTED_MODULE_3__["conditionalClassName"])(classes.expanded, !project.inputOutputCategory)), onClick: event => expandOrCollapseDefaultSectionSection(event, "inputOutputCategory") }, strings.getString("inputOutputCategoryName", "Input / Output")),
+            !project.inputOutputCategory && (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("ul", { className: classes.content },
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"](ExplorerItem, { type: "Pin" }),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"](ExplorerItem, { type: "Button" }),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"](ExplorerItem, { type: "Constant" }),
@@ -7973,18 +8023,78 @@ const Explorer = props => {
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"](ExplorerItem, { type: "LED Matrix" }),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"](ExplorerItem, { type: "Graphics Array" }),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"](ExplorerItem, { type: "Probe" }))) || null),
-        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("li", { className: classes.section },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: Object(_themes__WEBPACK_IMPORTED_MODULE_2__["classNames"])(classes.header, Object(_themes__WEBPACK_IMPORTED_MODULE_2__["conditionalClassName"])(classes.expanded, defaultSectionsExpandedState.primitivesSection)), onClick: event => expandOrCollapseDefaultSectionSection(event, "primitivesSection") }, "Primitives"),
-            defaultSectionsExpandedState.primitivesSection && (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("ul", { className: classes.content }, gatterItems.map(gatterItem => react__WEBPACK_IMPORTED_MODULE_0__["createElement"](ExplorerItem, Object.assign({ key: gatterItem.gatterType }, gatterItem))))) || null)));
+        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("li", { className: classes.category },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: Object(_themes__WEBPACK_IMPORTED_MODULE_3__["classNames"])(classes.header, Object(_themes__WEBPACK_IMPORTED_MODULE_3__["conditionalClassName"])(classes.expanded, !project.primitivesCategory)), onClick: event => expandOrCollapseDefaultSectionSection(event, "primitivesCategory") }, strings.getString("primitivesCategoryName", "Primitives")),
+            !project.primitivesCategory && (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("ul", { className: classes.content }, gatterItems.map(gatterItem => react__WEBPACK_IMPORTED_MODULE_0__["createElement"](ExplorerItem, Object.assign({ key: gatterItem.gatterType }, gatterItem))))) || null)));
 };
 const ExplorerItem = props => {
-    const classes = Object(_themes__WEBPACK_IMPORTED_MODULE_2__["useTheme"])(themedClasses);
+    function onDragStart(event) {
+        event.stopPropagation();
+    }
+    const classes = Object(_themes__WEBPACK_IMPORTED_MODULE_3__["useTheme"])(themedClasses);
     const editor = "gatterType" in props
-        ? react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_gatterItem__WEBPACK_IMPORTED_MODULE_6__["GatterItem"], { gatterType: props.gatterType, isTemplateItem: true })
+        ? react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_gatterItem__WEBPACK_IMPORTED_MODULE_8__["GatterItem"], { gatterType: props.gatterType, isTemplateItem: true })
         : "type" in props
-            ? react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_basicItem__WEBPACK_IMPORTED_MODULE_4__["BasicItem"], { type: props.type, isTemplateItem: true })
-            : react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_circuit__WEBPACK_IMPORTED_MODULE_5__["Circuit"], { mode: props.circuit.showVisualElements ? "Preview" : "Chip", circuit: props.circuit });
-    return (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("li", { className: classes.item }, editor));
+            ? react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_basicItem__WEBPACK_IMPORTED_MODULE_6__["BasicItem"], { type: props.type, isTemplateItem: true })
+            : react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_circuit__WEBPACK_IMPORTED_MODULE_7__["Circuit"], { mode: props.circuit.showVisualElements ? "Preview" : "Chip", circuit: props.circuit });
+    const isSelectedCircuit = ("circuit" in props) && props.circuit.id === props.selectedCircuitId;
+    return (react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("li", { className: Object(_themes__WEBPACK_IMPORTED_MODULE_3__["classNames"])(classes.item, Object(_themes__WEBPACK_IMPORTED_MODULE_3__["conditionalClassName"])(classes.pointer, !isSelectedCircuit)), draggable: !isSelectedCircuit, onDragStart: onDragStart }, editor));
+};
+//#endregion
+
+
+/***/ }),
+/* 93 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createNewProjectAction", function() { return createNewProjectAction; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "expandOrCollapseCategoryAction", function() { return expandOrCollapseCategoryAction; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "expandOrCollapseSpecialCategoryAction", function() { return expandOrCollapseSpecialCategoryAction; });
+/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(83);
+/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(uuid__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _easm_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(75);
+/* harmony import */ var _applicationStore__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(82);
+
+
+
+//#region Constants
+const dataStore = Object(_applicationStore__WEBPACK_IMPORTED_MODULE_2__["useDataStore"])();
+const uiStore = Object(_applicationStore__WEBPACK_IMPORTED_MODULE_2__["useUIStore"])();
+//#endregion
+//#region Actions
+const createNewProjectAction = () => {
+    const mainCircuit = {
+        id: uuid__WEBPACK_IMPORTED_MODULE_0__(),
+        name: "New Circuit",
+        category: null,
+        showVisualElements: false
+    };
+    const defaultCategoy = {
+        name: null,
+        circuits: [mainCircuit],
+        isCollapsed: false
+    };
+    const project = {
+        id: uuid__WEBPACK_IMPORTED_MODULE_0__(),
+        startCircuitId: mainCircuit.id,
+        categories: [defaultCategoy],
+        textNoteCategory: true,
+        inputOutputCategory: true,
+        primitivesCategory: true
+    };
+    dataStore.set(["state", "project"], project);
+    uiStore.set(["state", "selectedCircuitId"], project.startCircuitId);
+};
+const expandOrCollapseCategoryAction = (category) => {
+    const categories = dataStore.get(["state", "project"]).categories;
+    const index = categories.indexOf(category);
+    dataStore.set(["state", "project", "categories", index], { ...category, isCollapsed: !category.isCollapsed });
+};
+const expandOrCollapseSpecialCategoryAction = (specialCategory) => {
+    const project = dataStore.get(["state", "project"]);
+    dataStore.set(["state", "project", specialCategory], !project[specialCategory]);
 };
 //#endregion
 
@@ -8003,7 +8113,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme) => ({
     icon: {
         flex: "0 0 4rem"
@@ -8103,7 +8213,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _themes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
 
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme) => ({
     itemEditor: {
         height: theme.fonts.lineHeightMedium,
@@ -8243,7 +8353,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _themes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
 
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme) => ({
     circuit: {
         display: "block",
@@ -8276,7 +8386,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme) => ({
     icon: {
         flex: "0 0 4rem"
@@ -8411,7 +8521,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _themes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
 
 
-//#region Konstanten
+//#region Constants
 const themedClasses = (theme) => ({
     zoom25: {},
     zoom50: {},
