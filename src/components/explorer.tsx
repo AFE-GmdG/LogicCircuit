@@ -3,7 +3,7 @@ import { get } from "@easm/core";
 
 import { LocalizedStrings } from "../common";
 import { Theme, useTheme, classNames, conditionalClassName } from "../themes";
-import { useDataStore } from "../store";
+import { useDataStore, useUIStore } from "../store";
 import { GatterType } from "../store/model/gatter";
 import {
 	LogicalProject,
@@ -100,6 +100,10 @@ const themedClasses = (theme: Theme) => ({
 		"&:hover": {
 			backgroundColor: theme.colors.hoverBackgroundColor
 		}
+	},
+
+	pointer: {
+		cursor: "pointer"
 	}
 });
 
@@ -150,6 +154,9 @@ export const Explorer: React.FC<ExplorerProps> = props => {
 	const { project } = useDataStore(store => ({
 		project: get(store.state.project)
 	}));
+	const { selectedCircuitId } = useUIStore(store => ({
+		selectedCircuitId: get(store.state.selectedCircuitId)
+	}));
 
 	const categories = project.categories;
 
@@ -167,7 +174,7 @@ export const Explorer: React.FC<ExplorerProps> = props => {
 								<ul className={ classes.content }>
 									{
 										category.circuits.map(circuit => (
-											<ExplorerItem key={ circuit.id } circuit={ circuit } />
+											<ExplorerItem key={ circuit.id } circuit={ circuit } selectedCircuitId={ selectedCircuitId } />
 										))
 									}
 								</ul>
@@ -232,6 +239,7 @@ type ExplorerItemProps =
 
 type CircuitExplorerItemProps = {
 	circuit: LogicalCircuit;
+	selectedCircuitId: string;
 };
 
 type BasicItemProps = {
@@ -244,6 +252,10 @@ type GatterExplorerItemProps = {
 };
 
 const ExplorerItem: React.FC<ExplorerItemProps> = props => {
+	function onDragStart(event: React.DragEvent<HTMLLIElement>) {
+		event.stopPropagation();
+	}
+
 	const classes = useTheme(themedClasses);
 
 	const editor = "gatterType" in props
@@ -252,8 +264,11 @@ const ExplorerItem: React.FC<ExplorerItemProps> = props => {
 			? <BasicItem type={ props.type } isTemplateItem />
 			: <Circuit mode={ props.circuit.showVisualElements ? "Preview" : "Chip" } circuit={ props.circuit } />
 
+	const isSelectedCircuit = ("circuit" in props) && props.circuit.id === props.selectedCircuitId;
 	return (
-		<li className={ classes.item }>
+		<li className={ classNames(classes.item, conditionalClassName(classes.pointer, !isSelectedCircuit)) }
+			draggable={ !isSelectedCircuit }
+			onDragStart={ onDragStart }>
 			{ editor }
 		</li>);
 }
