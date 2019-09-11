@@ -1,6 +1,6 @@
 {
   "name": "logic-circuit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A logical circuit simulator",
   "scripts": {
     "start": "webpack-dev-server --env debug",
@@ -29,17 +29,17 @@
     "@types/uuid": "3.4.5",
     "copy-webpack-plugin": "5.0.4",
     "html-webpack-plugin": "3.2.0",
-    "jss": "9.8.7",
-    "jss-plugin-vendor-prefixer": "10.0.0-alpha.7",
-    "jss-preset-default": "4.5.0",
+    "jss": "10.0.0-alpha.24",
+    "jss-plugin-vendor-prefixer": "10.0.0-alpha.24",
+    "jss-preset-default": "10.0.0-alpha.24",
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "rimraf": "3.0.0",
-    "ts-loader": "6.0.4",
-    "typescript": "3.5.3",
+    "ts-loader": "6.1.0",
+    "typescript": "3.6.3",
     "uuid": "3.3.3",
-    "webpack": "4.39.2",
-    "webpack-cli": "3.3.7",
+    "webpack": "4.39.3",
+    "webpack-cli": "3.3.8",
     "webpack-dev-server": "3.8.0"
   }
 }
