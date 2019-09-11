@@ -89,6 +89,7 @@ const themedClasses = (theme: Theme) => ({
 	},
 
 	item: {
+		position: "relative",
 		display: "flex",
 		flexDirection: "row",
 		justifyContent: "flex-start",
@@ -253,11 +254,63 @@ type GatterExplorerItemProps = {
 
 const ExplorerItem: React.FC<ExplorerItemProps> = props => {
 	function onDragStart(event: React.DragEvent<HTMLLIElement>) {
-		event.stopPropagation();
+		try {
+			const { altKey, ctrlKey, shiftKey, metaKey, dataTransfer } = event;
+			if (altKey || ctrlKey || shiftKey || metaKey) {
+				return;
+			}
+
+			dataTransfer.effectAllowed = "copy";
+			if ("gatterType" in props) {
+				const svgContainer = document.createElement("div");
+				svgContainer.id = "drag-drop-image";
+				const svg = document.createElement("svg");
+				svg.setAttribute("width", "40");
+				svg.setAttribute("height", "60");
+				svg.setAttribute("viewBox", "0 0 40 60");
+				const c1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+				c1.setAttribute("cx", "5");
+				c1.setAttribute("cy", "20");
+				c1.setAttribute("r", "2");
+				svg.appendChild(c1);
+				const c2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+				c2.setAttribute("cx", "5");
+				c2.setAttribute("cy", "40");
+				c2.setAttribute("r", "2");
+				svg.appendChild(c2);
+				const c3 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+				c3.setAttribute("cx", "35");
+				c3.setAttribute("cy", "30");
+				c3.setAttribute("r", "2");
+				svg.appendChild(c3);
+				const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+				p.setAttribute("d", "M 5,12 L 20,12 A 15,18 0 0 1 20,48 L 5,48 Z");
+				svg.appendChild(p);
+				svgContainer.appendChild(svg);
+				ref.current!.appendChild(svgContainer);
+				dataTransfer.setData("gatter:" + props.gatterType, "");
+				dataTransfer.setDragImage(svg, 0, 0);
+			} else if ("type" in props) {
+				dataTransfer.setData("basic:" + props.type, props.type);
+			} else {
+				dataTransfer.setData("circuit:" + props.circuit.id, props.circuit.id);
+			}
+
+		} finally {
+			event.stopPropagation();
+		}
+	}
+
+	function onDragEnd(event: React.DragEvent<HTMLLIElement>) {
+		try {
+			ref.current!.removeChild(document.getElementById("drag-drop-image") as HTMLElement);
+		} finally {
+			event.stopPropagation();
+		}
 	}
 
 	const classes = useTheme(themedClasses);
-
+	const ref = React.useRef<HTMLLIElement>(null);
 	const editor = "gatterType" in props
 		? <GatterItem gatterType={ props.gatterType } isTemplateItem />
 		: "type" in props
@@ -266,9 +319,11 @@ const ExplorerItem: React.FC<ExplorerItemProps> = props => {
 
 	const isSelectedCircuit = ("circuit" in props) && props.circuit.id === props.selectedCircuitId;
 	return (
-		<li className={ classNames(classes.item, conditionalClassName(classes.pointer, !isSelectedCircuit)) }
+		<li ref={ ref }
+			className={ classNames(classes.item, conditionalClassName(classes.pointer, !isSelectedCircuit)) }
 			draggable={ !isSelectedCircuit }
-			onDragStart={ onDragStart }>
+			onDragStart={ onDragStart }
+			onDragEnd={ onDragEnd }>
 			{ editor }
 		</li>);
 }

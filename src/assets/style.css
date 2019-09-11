@@ -32,6 +32,17 @@ div {
 	height: 0;
 }
 
+#drag-drop-image {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 1;
+	border: 1px solid red;
+	padding: 4px;
+	width: 40px;
+	height: 60px;
+}
+
 #app {
 	height: 100vh;
 	overflow: hidden;
