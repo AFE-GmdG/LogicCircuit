@@ -105,6 +105,24 @@ const themedClasses = (theme: Theme) => ({
 
 	pointer: {
 		cursor: "pointer"
+	},
+
+	dragDropSvg: {
+		flex: "1 0 0px",
+		backgroundColor: "cadetblue"
+	},
+
+	thinLines: {
+		stroke: theme.svg.stroke,
+		strokeWidth: theme.svg.strokeWidthThin
+	},
+
+	blackFill: {
+		fill: theme.svg.fillBlack
+	},
+
+	whiteFill: {
+		fill: theme.svg.fillWhite
 	}
 });
 
@@ -253,6 +271,43 @@ type GatterExplorerItemProps = {
 };
 
 const ExplorerItem: React.FC<ExplorerItemProps> = props => {
+	function onClick(event: React.MouseEvent<HTMLLIElement>) {
+		if ("gatterType" in props) {
+			const svgContainer = document.createElement("div");
+			svgContainer.id = "drag-drop-image";
+			const svg = document.createElement("svg");
+			// svg.setAttribute("width", "40");
+			// svg.setAttribute("height", "60");
+			svg.setAttributeNS("http://www.w3.org/2000/svg", "viewBox", "0 0 40 60");
+			svg.className = classes.dragDropSvg;
+			const c1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+			c1.setAttributeNS("http://www.w3.org/2000/svg", "cx", "5");
+			c1.setAttributeNS("http://www.w3.org/2000/svg", "cy", "20");
+			c1.setAttributeNS("http://www.w3.org/2000/svg", "r", "2");
+			c1.classList.add(classes.thinLines, classes.blackFill);
+			svg.appendChild(c1);
+			const c2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+			c2.setAttributeNS("http://www.w3.org/2000/svg", "cx", "5");
+			c2.setAttributeNS("http://www.w3.org/2000/svg", "cy", "40");
+			c2.setAttributeNS("http://www.w3.org/2000/svg", "r", "2");
+			c2.classList.add(classes.thinLines, classes.blackFill);
+			svg.appendChild(c2);
+			const c3 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+			c3.setAttributeNS("http://www.w3.org/2000/svg", "cx", "35");
+			c3.setAttributeNS("http://www.w3.org/2000/svg", "cy", "30");
+			c3.setAttributeNS("http://www.w3.org/2000/svg", "r", "2");
+			c3.classList.add(classes.thinLines, classes.blackFill);
+			svg.appendChild(c3);
+			const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+			p.setAttributeNS("http://www.w3.org/2000/svg", "d", "M 5,12 L 20,12 A 15,18 0 0 1 20,48 L 5,48 Z");
+			p.classList.add(classes.thinLines, classes.whiteFill);
+			svg.appendChild(p);
+			svgContainer.appendChild(svg);
+			ref.current!.appendChild(svgContainer);
+		}
+		event.stopPropagation();
+	}
+
 	function onDragStart(event: React.DragEvent<HTMLLIElement>) {
 		try {
 			const { altKey, ctrlKey, shiftKey, metaKey, dataTransfer } = event;
@@ -322,6 +377,7 @@ const ExplorerItem: React.FC<ExplorerItemProps> = props => {
 		<li ref={ ref }
 			className={ classNames(classes.item, conditionalClassName(classes.pointer, !isSelectedCircuit)) }
 			draggable={ !isSelectedCircuit }
+			onClick={ onClick }
 			onDragStart={ onDragStart }
 			onDragEnd={ onDragEnd }>
 			{ editor }
