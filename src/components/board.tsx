@@ -75,13 +75,30 @@ type BoardProps = {
 
 //#region Circuit
 export const Board: React.FC<BoardProps> = props => {
+	function onDragOver(event: React.DragEvent<SVGSVGElement>) {
+		try {
+			const { dataTransfer } = event;
+			const gatterType = dataTransfer.types.find(type => type.indexOf("gatter:") === 0)
+			if (!gatterType) {
+				return;
+			}
+			console.log(dataTransfer.effectAllowed);
+			dataTransfer.dropEffect = "copy";
+			event.preventDefault();
+		} catch (ex) {
+			console.log(ex);
+		} finally {
+			event.stopPropagation();
+		}
+	}
+
 	const { className, circuit } = props;
 	const classes = useTheme(themedClasses);
 
 	return (
 		<div className={ classNames(className, classes.board) }>
 			<div className={ classes.scrollContainer }>
-				<svg className={ classNames(classes.canvas) } viewBox="0 0 4096 4096">
+				<svg className={ classNames(classes.canvas) } viewBox="0 0 4096 4096" onDragOver={ onDragOver }>
 					<rect className={ classes.boardBackgroundPattern }
 						x1={ 0 } y1={ 0 } width={ 4096 } height={ 4096 }
 					/>

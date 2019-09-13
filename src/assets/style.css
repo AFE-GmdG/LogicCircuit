@@ -40,12 +40,9 @@ div {
 	align-items: stretch;
 	left: 0;
 	top: 0;
-	z-index: 1;
-	border: 1px solid red;
-	padding: 4px;
+	z-index: -1;
 	width: 40px;
 	height: 60px;
-	background-color: lightskyblue;
 }
 
 #app {
