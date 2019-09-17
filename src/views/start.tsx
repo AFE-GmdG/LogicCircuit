@@ -5,7 +5,7 @@ import { orThrow } from "../common";
 import { Theme, useTheme } from "../themes";
 import { useUIStore, useDataStore } from "../store";
 
-import { LogicalCircuit } from "../store/model/logicalProject";
+import { LogicalCircuit } from "../store/model/types";
 
 import { MenuBar } from "../components/menuBar";
 import { StatusBar } from "../components/statusBar";
@@ -48,8 +48,9 @@ const themedClasses = (theme: Theme) => ({
 //#region Start (View)
 export const Start: React.FC = props => {
 	const classes = useTheme(themedClasses);
-	const { selectedCircuitId } = useUIStore(store => ({
-		selectedCircuitId: get(store.state.selectedCircuitId)
+	const { selectedCircuitId, zoom } = useUIStore(store => ({
+		selectedCircuitId: get(store.state.selectedCircuitId),
+		zoom: get(store.state.zoom)
 	}));
 	const { project } = useDataStore(store => ({
 		project: get(store.state.project)
@@ -61,7 +62,7 @@ export const Start: React.FC = props => {
 	return (
 		<div className={ classes.start }>
 			<Explorer />
-			<Board className={ classes.content } circuit={ currentBoard }></Board>
+			<Board className={ classes.content } circuit={ currentBoard } zoom={ zoom } />
 			<MenuBar className={ classes.header } />
 			<StatusBar className={ classes.footer } />
 		</div>

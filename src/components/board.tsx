@@ -1,13 +1,17 @@
 import * as React from "react";
 import { Theme, useTheme, classNames } from "../themes";
 
-import { LogicalCircuit } from "../store/model/logicalProject";
+import { LogicalCircuit, Zoom } from "../store/model/types";
 
 //#region Constants
 const themedClasses = (theme: Theme) => ({
 	zoom25: {},
 	zoom50: {},
+	zoom75: {},
+	zoom100: {},
+	zoom125: {},
 	zoom150: {},
+	zoom175: {},
 	zoom200: {},
 
 	board: {
@@ -27,7 +31,6 @@ const themedClasses = (theme: Theme) => ({
 	},
 
 	canvas: {
-		width: "4096px",
 		margin: "0 auto",
 
 		"&$zoom25": {
@@ -46,8 +49,32 @@ const themedClasses = (theme: Theme) => ({
 			}
 		},
 
+		"&$zoom75": {
+			width: "3072px",
+
+			"& $boardBackgroundPattern": {
+				fill: "url(#board-background-pattern-x2)"
+			}
+		},
+
+		"&$zoom100": {
+			width: "4096px",
+
+			"& $boardBackgroundPattern": {
+				fill: "url(#board-background-pattern-x2)"
+			}
+		},
+
+		"&$zoom125": {
+			width: "5120px"
+		},
+
 		"&$zoom150": {
 			width: "6140px"
+		},
+
+		"&$zoom175": {
+			width: "7168px"
 		},
 
 		"&$zoom200": {
@@ -70,11 +97,29 @@ const themedClasses = (theme: Theme) => ({
 type BoardProps = {
 	className?: string;
 	circuit: LogicalCircuit;
+	zoom: Zoom;
 }
+
+type Position = {
+	x: number;
+	y: number;
+};
 //#endregion
 
 //#region Circuit
 export const Board: React.FC<BoardProps> = props => {
+	function onDragEnter(event: React.DragEvent<SVGSVGElement>) {
+		try {
+			console.log("onDragEnter");
+			console.log(event.clientX, event.currentTarget.parentElement!.scrollLeft);
+
+		} catch (ex) {
+			console.error("onDragEnter", ex);
+		} finally {
+			event.stopPropagation();
+		}
+	}
+
 	function onDragOver(event: React.DragEvent<SVGSVGElement>) {
 		try {
 			const { dataTransfer } = event;
@@ -82,23 +127,70 @@ export const Board: React.FC<BoardProps> = props => {
 			if (!gatterType) {
 				return;
 			}
-			console.log(dataTransfer.effectAllowed);
+
 			dataTransfer.dropEffect = "copy";
 			event.preventDefault();
 		} catch (ex) {
-			console.log(ex);
+			console.error("onDragOver", ex);
 		} finally {
 			event.stopPropagation();
 		}
 	}
 
-	const { className, circuit } = props;
+	function onDragLeave(event: React.DragEvent<SVGSVGElement>) {
+		try {
+			console.log("onDragLeave");
+
+		} catch (ex) {
+			console.error("onDragLeave", ex);
+		} finally {
+			event.stopPropagation();
+		}
+	}
+
+	function onDrop(event: React.DragEvent<SVGSVGElement>) {
+		try {
+			console.log("onDrop");
+
+		} catch (ex) {
+			console.error("onDrop", ex);
+		} finally {
+			event.stopPropagation();
+		}
+	}
+
+	const { className, circuit, zoom } = props;
 	const classes = useTheme(themedClasses);
+	const canvasRef = React.useRef<SVGSVGElement>(null);
+	let dragDropMousePosition: Position | null = null;
+	let dragDropGroup: SVGGElement | null = null;
+
+	const zoomClass = zoom === Zoom["25%"]
+		? classes.zoom25
+		: zoom === Zoom["50%"]
+			? classes.zoom50
+			: zoom === Zoom["75%"]
+				? classes.zoom75
+				: zoom === Zoom["100%"]
+					? classes.zoom100
+					: zoom === Zoom["125%"]
+						? classes.zoom125
+						: zoom === Zoom["150%"]
+							? classes.zoom150
+							: zoom === Zoom["175%"]
+								? classes.zoom175
+								: classes.zoom200;
 
 	return (
 		<div className={ classNames(className, classes.board) }>
 			<div className={ classes.scrollContainer }>
-				<svg className={ classNames(classes.canvas) } viewBox="0 0 4096 4096" onDragOver={ onDragOver }>
+				<svg ref={ canvasRef }
+					className={ classNames(classes.canvas, zoomClass) }
+					viewBox="0 0 4096 4096"
+					onDragEnter={ onDragEnter }
+					onDragOver={ onDragOver }
+					onDragLeave={ onDragLeave }
+					onDrop={ onDrop }>
 					<rect className={ classes.boardBackgroundPattern }
 						x1={ 0 } y1={ 0 } width={ 4096 } height={ 4096 }
 					/>

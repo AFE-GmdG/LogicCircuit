@@ -2,11 +2,12 @@ import * as uuid from "uuid";
 import { Store } from "@easm/core";
 import { createHook } from "@easm/react";
 
-import { LogicalProject, DefaultCategoy, LogicalCircuit } from "./model/logicalProject";
+import { LogicalProject, DefaultCategoy, LogicalCircuit, Zoom } from "./model/types";
 
 type ApplicationStoreState = {
 	ui: {
 		selectedCircuitId: string;
+		zoom: Zoom;
 	},
 	data: {
 		project: LogicalProject
@@ -32,11 +33,15 @@ const project: LogicalProject = {
 	categories: [defaultCategoy],
 	textNoteCategory: true,
 	inputOutputCategory: true,
-	primitivesCategory: true
+	primitivesCategory: true,
+	zoom: Zoom["100%"]
 };
 
 const applicationStore = new Store<ApplicationStoreState>({
-	ui: { selectedCircuitId: project.startCircuitId },
+	ui: {
+		selectedCircuitId: project.startCircuitId,
+		zoom: Zoom["100%"]
+	},
 	data: { project }
 });
 

@@ -5,13 +5,8 @@ import { LocalizedStrings } from "../common";
 import { Theme, useTheme, classNames, conditionalClassName } from "../themes";
 import { useDataStore, useUIStore } from "../store";
 import { GatterType } from "../store/model/gatter";
-import {
-	LogicalProject,
-	Category,
-	LogicalCircuit,
-	expandOrCollapseCategoryAction,
-	expandOrCollapseSpecialCategoryAction
-} from "../store/model/logicalProject";
+import { LogicalProject, Category, LogicalCircuit } from "../store/model/types";
+import { expandOrCollapseCategoryAction, expandOrCollapseSpecialCategoryAction } from "../store/model/logicalProject";
 
 import { BasicItem, BasicItemType } from "./basicItem";
 import { Circuit } from "./circuit";
@@ -277,40 +272,13 @@ const ExplorerItem: React.FC<ExplorerItemProps> = props => {
 				return;
 			}
 
+			// Set an empty div as drag image. The image is changed dynamicly in onDragEnter/onDragOver/onDragLeave/onDragExit events.
+			const emptyDiv = document.createElement("div");
+			dataTransfer.setDragImage(emptyDiv, 0, 0);
 			dataTransfer.effectAllowed = "copy";
+
 			if ("gatterType" in props) {
-				const xmlns = "http://www.w3.org/2000/svg";
-				const svgContainer = document.createElement("div");
-				svgContainer.id = "drag-drop-image";
-				const svg = document.createElementNS(xmlns, "svg");
-				svg.setAttributeNS(null, "viewBox", "0 0 40 60");
-				svg.classList.add(classes.dragDropSvg);
-				const c1 = document.createElementNS(xmlns, "circle");
-				c1.setAttributeNS(null, "cx", "5");
-				c1.setAttributeNS(null, "cy", "20");
-				c1.setAttributeNS(null, "r", "2");
-				c1.classList.add(classes.thinLines, classes.blackFill);
-				svg.appendChild(c1);
-				const c2 = document.createElementNS(xmlns, "circle");
-				c2.setAttributeNS(null, "cx", "5");
-				c2.setAttributeNS(null, "cy", "40");
-				c2.setAttributeNS(null, "r", "2");
-				c2.classList.add(classes.thinLines, classes.blackFill);
-				svg.appendChild(c2);
-				const c3 = document.createElementNS(xmlns, "circle");
-				c3.setAttributeNS(null, "cx", "35");
-				c3.setAttributeNS(null, "cy", "30");
-				c3.setAttributeNS(null, "r", "2");
-				c3.classList.add(classes.thinLines, classes.blackFill);
-				svg.appendChild(c3);
-				const p = document.createElementNS(xmlns, "path");
-				p.setAttributeNS(null, "d", "M 5,12 L 20,12 A 15,18 0 0 1 20,48 L 5,48 Z");
-				p.classList.add(classes.thinLines, classes.whiteFill);
-				svg.appendChild(p);
-				svgContainer.appendChild(svg);
-				ref.current!.appendChild(svgContainer);
-				dataTransfer.setData("gatter:" + props.gatterType, "");
-				dataTransfer.setDragImage(svg, 0, 0);
+				dataTransfer.setData("gatter:" + props.gatterType, props.gatterType);
 			} else if ("type" in props) {
 				dataTransfer.setData("basic:" + props.type, props.type);
 			} else {
@@ -324,14 +292,12 @@ const ExplorerItem: React.FC<ExplorerItemProps> = props => {
 
 	function onDragEnd(event: React.DragEvent<HTMLLIElement>) {
 		try {
-			ref.current!.removeChild(document.getElementById("drag-drop-image") as HTMLElement);
 		} finally {
 			event.stopPropagation();
 		}
 	}
 
 	const classes = useTheme(themedClasses);
-	const ref = React.useRef<HTMLLIElement>(null);
 	const editor = "gatterType" in props
 		? <GatterItem gatterType={ props.gatterType } isTemplateItem />
 		: "type" in props
@@ -340,8 +306,7 @@ const ExplorerItem: React.FC<ExplorerItemProps> = props => {
 
 	const isSelectedCircuit = ("circuit" in props) && props.circuit.id === props.selectedCircuitId;
 	return (
-		<li ref={ ref }
-			className={ classNames(classes.item, conditionalClassName(classes.pointer, !isSelectedCircuit)) }
+		<li className={ classNames(classes.item, conditionalClassName(classes.pointer, !isSelectedCircuit)) }
 			draggable={ !isSelectedCircuit }
 			onDragStart={ onDragStart }
 			onDragEnd={ onDragEnd }>

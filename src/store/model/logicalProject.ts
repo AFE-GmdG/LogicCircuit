@@ -2,44 +2,11 @@ import * as uuid from "uuid";
 import { get, set } from "@easm/core";
 
 import { useDataStore, useUIStore } from "../applicationStore";
+import { LogicalProject, Category, DefaultCategoy, LogicalCircuit, Zoom } from "./types";
 
 //#region Constants
 const dataStore = useDataStore();
 const uiStore = useUIStore();
-//#endregion
-
-//#region Types
-export type LogicalProject = {
-	id: string;
-	startCircuitId: string;
-	categories: Category[];
-	textNoteCategory: boolean;
-	inputOutputCategory: boolean;
-	primitivesCategory: boolean;
-};
-
-export type Category =
-	DefaultCategoy |
-	NamedCategory;
-
-export type DefaultCategoy = {
-	name: null;
-	circuits: LogicalCircuit[];
-	isCollapsed: boolean;
-};
-
-export type NamedCategory = {
-	name: string;
-	circuits: LogicalCircuit[];
-	isCollapsed: boolean;
-};
-
-export type LogicalCircuit = {
-	id: string;
-	name: string;
-	category: string | null;
-	showVisualElements: boolean;
-};
 //#endregion
 
 //#region Actions
@@ -63,7 +30,8 @@ export const createNewProjectAction = () => {
 		categories: [defaultCategoy],
 		textNoteCategory: true,
 		inputOutputCategory: true,
-		primitivesCategory: true
+		primitivesCategory: true,
+		zoom: Zoom["100%"]
 	};
 
 	set(dataStore.state.project, project);
@@ -79,5 +47,9 @@ export const expandOrCollapseCategoryAction = (category: Category) => {
 export const expandOrCollapseSpecialCategoryAction = (specialCategory: keyof Pick<LogicalProject, "textNoteCategory" | "inputOutputCategory" | "primitivesCategory">) => {
 	const project = get(dataStore.state.project);
 	set(dataStore.state.project[specialCategory], !project[specialCategory]);
+};
+
+export const setZoomAction = (zoom: Zoom) => {
+	set(uiStore.state.zoom, zoom);
 };
 //#endregion

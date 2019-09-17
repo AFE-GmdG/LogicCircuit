@@ -32,19 +32,6 @@ div {
 	height: 0;
 }
 
-#drag-drop-image {
-	position: absolute;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: stretch;
-	left: 0;
-	top: 0;
-	z-index: -1;
-	width: 40px;
-	height: 60px;
-}
-
 #app {
 	height: 100vh;
 	overflow: hidden;

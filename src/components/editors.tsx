@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Theme, useTheme, classNames } from "../themes";
+import { Theme, useTheme } from "../themes";
 
 //#region Constants
 const themedClasses = (theme: Theme) => ({
