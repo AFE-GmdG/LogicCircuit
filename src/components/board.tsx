@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Theme, useTheme, classNames } from "../themes";
+import { FileSystemEntry } from "../common/dragDropFileSystem";
 
 import { LogicalCircuit, Zoom } from "../store/model/types";
 
@@ -110,9 +111,18 @@ type Position = {
 export const Board: React.FC<BoardProps> = props => {
 	function onDragEnter(event: React.DragEvent<SVGSVGElement>) {
 		try {
-			console.log("onDragEnter");
-			console.log(event.clientX, event.currentTarget.parentElement!.scrollLeft);
-
+			const { clientX, clientY, currentTarget, dataTransfer } = event;
+			const gatterType = dataTransfer.types.find(type => type.indexOf("gatter:") === 0);
+			if (!gatterType) {
+				dataTransfer.dropEffect = "none";
+				event.preventDefault();
+				return;
+			}
+			const { left, top } = currentTarget.getBoundingClientRect();
+			dragDropMousePosition = {
+				x: (clientX - left) / zoom,
+				y: (clientY - top) / zoom
+			};
 		} catch (ex) {
 			console.error("onDragEnter", ex);
 		} finally {
@@ -122,7 +132,13 @@ export const Board: React.FC<BoardProps> = props => {
 
 	function onDragOver(event: React.DragEvent<SVGSVGElement>) {
 		try {
-			const { dataTransfer } = event;
+			const { clientX, clientY, dataTransfer } = event;
+			if (dataTransfer.types.includes("Files")) {
+				dataTransfer.dropEffect = "copy";
+				event.preventDefault();
+				return;
+			}
+
 			const gatterType = dataTransfer.types.find(type => type.indexOf("gatter:") === 0)
 			if (!gatterType) {
 				return;
@@ -150,8 +166,37 @@ export const Board: React.FC<BoardProps> = props => {
 
 	function onDrop(event: React.DragEvent<SVGSVGElement>) {
 		try {
-			console.log("onDrop");
+			const { clientX, clientY, dataTransfer } = event;
+			if (dataTransfer.types.includes("Files")) {
+				try {
+					for (let i = 0; i < dataTransfer.items.length; ++i) {
+						const item = dataTransfer.items[i] as DataTransferItem & {
+							getAsEntry(): FileSystemEntry;
+							webkitGetAsEntry(): FileSystemEntry;
+						};
+						if (item.kind !== "file") {
+							continue;
+						}
+						const getAsEntry = item.getAsEntry || item.webkitGetAsEntry
+						const entry: FileSystemEntry = getAsEntry.apply(item);
+						if (entry.isDirectory) {
+							const reader = entry.createReader();
+							reader.readEntries(entries => {
+								entries.forEach(entry => {
+									console.log(entry);
+								});
+							});
+						}
+					}
+				} catch (ex) {
+					console.error("onDrop", ex);
+				}
+				event.preventDefault();
+				return;
+			}
 
+			console.log("onDrop");
+			event.preventDefault();
 		} catch (ex) {
 			console.error("onDrop", ex);
 		} finally {
